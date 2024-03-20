@@ -1,4 +1,4 @@
-import React from "react";
+import { Slider } from "@/components/ui/slider";
 
 const page = () => {
   return (
@@ -6,8 +6,9 @@ const page = () => {
       <div className="flex justify-center">
         <div className="bg-gray-600 w-[1244px] h-[732px] rounded-2xl">aa</div>
       </div>
-      <div className="flex justify-center mt-5">
-        <div className="bg-gray-500 w-[190px] h-[190px] rounded-full"></div>
+      <div className="flex mt-5 justify-center">
+        <div className="bg-gray-500 w-[190px] h-[190px] rounded-full" />
+        <Slider defaultValue={[33]} max={100} step={1} className="w-[466px]" />
       </div>
     </div>
   );
