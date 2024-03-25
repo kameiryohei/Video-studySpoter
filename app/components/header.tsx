@@ -27,7 +27,7 @@ const Header = () => {
         <div suppressHydrationWarning={true}>
           <div style={{ paddingBottom: "1rem" }}>{ currentUser.email } でログインしています。</div>
           <div>
-            <button onClick={()=>{
+            <button className="btn-primary" onClick={()=>{
               doLogout();
             }} >
               ログアウト
@@ -38,8 +38,8 @@ const Header = () => {
         <div suppressHydrationWarning={true}>
           ログインしていません。
           <div>
-            <Link href="/login">ログイン</Link>
-            <Link href="/register">新規登録</Link>
+            <Link className="btn-primary" href="/login">ログイン</Link>
+            <Link className="btn-primary" href="/register">新規登録</Link>
           </div>
         </div>  
       )}
