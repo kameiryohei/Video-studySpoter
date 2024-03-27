@@ -1,127 +1,128 @@
 "use client";
-
 import OT from "@opentok/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { SlArrowLeft } from "react-icons/sl";
+import { SlArrowLeftCircle, SlArrowRightCircle } from "react-icons/sl";
 
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID;
-const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
+type Stream = {
+  streamId: string;
+  subscriberId: string;
+};
 
-function handleError(error: any) {
-  if (!error) return;
-  alert(error.message);
-}
+const apiKey = process.env.NEXT_PUBLIC_OPENTOK_API_KEY;
+const sessionId = process.env.NEXT_PUBLIC_OPENTOK_SESSION_ID;
+const token = process.env.NEXT_PUBLIC_OPENTOK_TOKEN;
 
-export default function Home() {
-  const [session, setSession] = useState<any>(null);
-  const [publisher, setPublisher] = useState<any>(null);
-  const [subscribers, setSubscribers] = useState<any[]>([]);
+const page = () => {
+  const [subscribers, setSubscribers] = useState<Stream[]>([]);
+  const [publisher, setPublisher] = useState<OT.Publisher | null>(null); // 新しい状態を追加
 
-  useEffect(() => {
-    if (!API_KEY || !SESSION_ID || !TOKEN) {
-      alert("API_KEY, SESSION_ID, and TOKEN is required");
+  // エラーはalertで通知する
+  const handleError = (error: any) => {
+    if (error) {
+      alert(error.message);
+    }
+  };
+
+  const initializeSession = () => {
+    if (!apiKey || !sessionId || !token) {
       return;
     }
-    const initSession = OT.initSession(API_KEY, SESSION_ID);
-    setSession(initSession);
+    const session = OT.initSession(apiKey, sessionId);
 
-    const initPublisher = OT.initPublisher(
+    // 新しく作られたstreamにsubscribeする
+    session.on("streamCreated", function (event: any) {
+      session.subscribe(
+        event.stream,
+        "subscriber",
+        {
+          insertMode: "append",
+          width: "100%",
+          height: "100%",
+          subscribeToAudio: false,
+        },
+        handleError
+      );
+    });
+
+    // publisherを作成
+    const publisher = OT.initPublisher(
       "publisher",
       {
         insertMode: "append",
         width: "100%",
         height: "100%",
+        //マイクをオフにする
+        publishAudio: false,
       },
       handleError
     );
-    setPublisher(initPublisher);
+    setPublisher(publisher);
 
-    initSession.on("streamCreated", function (event) {
-      // 新しいサブスクライバーを作成
-      const newSubscriber = initSession.subscribe(
-        event.stream,
-        `subscriber${subscribers.length + 1}`,
-        {
-          insertMode: "append",
-          width: "100%",
-          height: "100%",
-        },
-        handleError
-      );
-
-      setSubscribers((prevSubscribers) => [...prevSubscribers, newSubscriber]); // 新しいサブスクライバーをstateに設定
-    });
-
-    initSession.on("streamDestroyed", function (event) {
-      // ストリームが破棄された場合、サブスクライバーも破棄する
-      setSubscribers((prevSubscribers) =>
-        prevSubscribers.filter(
-          (subscriber) => subscriber.stream !== event.stream
-        )
-      );
-    });
-
-    initSession.connect(TOKEN, function (error) {
+    // セッションに接続
+    session.connect(token, function (error) {
       if (error) {
-        return handleError(error);
+        handleError(error);
+      } else {
+        session.publish(publisher, handleError);
       }
-      initSession.publish(initPublisher, handleError);
     });
+  };
+  const toggleCamera = () => {
+    if (publisher) {
+      if (publisher.stream) publisher.publishVideo(!publisher.stream.hasVideo);
+    }
+  };
 
+  useEffect(() => {
+    if (!apiKey || !sessionId || !token) {
+      return;
+    }
+    const session = OT.initSession(apiKey, sessionId);
+    initializeSession();
     return () => {
-      if (initSession) {
-        initSession.disconnect();
-      }
-      if (initPublisher) {
-        initPublisher.destroy();
-      }
-      // subscriberのクリーンアップも行います。
-      subscribers.forEach((subscriber) => {
-        subscriber.destroy();
-      });
+      session.disconnect();
     };
   }, []);
 
   return (
     <>
       <Link href="/workspace/stanby">
-        <SlArrowLeft
+        <SlArrowLeftCircle
           size={40}
-          className="mt-5 ml-5 ring-1 ring-blue-500 hover:ring-blue-200 transition-all duration-300 ease-in-out rounded-full p-1 cursor-pointer"
+          className="mt-5 ml-5 hover:ring-4 hover:ring-blue-300 rounded-full duration-300"
         />
       </Link>
-      <div className="mt-44 flex justify-center items-center flex-col">
-        <div className="flex justify-center gap-10">
-          <div
-            className="w-[375px] h-[299px] bg-slate-300 rounded-2xl"
-            id="publisher"
-          ></div>
-          <div
-            className="w-[375px] h-[299px] bg-slate-300 rounded-2xl"
-            id="subscriber1"
-          ></div>
-          <div
-            className="w-[375px] h-[299px] bg-slate-300 rounded-2xl"
-            id="subscriber2"
-          ></div>
-        </div>
-        <div className="flex justify-center gap-10 mt-4">
-          <div
-            className="w-[375px] h-[299px] bg-slate-300 rounded-2xl"
-            id="subscriber3"
-          ></div>
-          <div
-            className="w-[375px] h-[299px] bg-slate-300 rounded-2xl"
-            id="subscriber4"
-          ></div>
-          <div
-            className="w-[375px] h-[299px] bg-slate-300 rounded-2xl"
-            id="subscriber5"
-          ></div>
+      <Link href="/">
+        <SlArrowRightCircle
+          size={40}
+          className=" absolute right-0 top-0 mt-5 mr-5 hover:ring-4 hover:ring-blue-300 rounded-full duration-300"
+        />
+      </Link>
+      <div className="mt-36 flex justify-center items-center flex-col">
+        <div className="flex justify-center gap-10 flex-wrap">
+          <div className="flex flex-col items-center">
+            <div
+              className="w-[675px] h-[599px] bg-slate-300 rounded-2xl"
+              id="publisher"
+            />
+            <button
+              className="py-2 px-3 mt-3 text-white bg-gray-800 rounded-2xl hover:bg-gray-600 duration-300s"
+              onClick={toggleCamera}
+            >
+              カメラをオフ
+            </button>
+          </div>
+          <div>
+            <div
+              className="w-[675px] h-[599px] bg-slate-300 rounded-2xl"
+              id="subscriber"
+            />
+          </div>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default page;
