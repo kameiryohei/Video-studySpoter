@@ -1,4 +1,5 @@
 import { Slider } from "@/components/ui/slider";
+import Link from "next/link";
 
 const page = () => {
   return (
@@ -7,7 +8,9 @@ const page = () => {
         <div className="bg-gray-600 w-[1244px] h-[732px] rounded-2xl">aa</div>
       </div>
       <div className="flex mt-5 justify-center">
-        <div className="bg-gray-500 w-[190px] h-[190px] rounded-full" />
+        <Link href="/workspace/stanby/video">
+          <div className="bg-gray-500 w-[190px] h-[190px] rounded-full" />
+        </Link>
         <Slider defaultValue={[33]} max={100} step={1} className="w-[466px]" />
       </div>
     </div>

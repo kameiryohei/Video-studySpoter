@@ -7,7 +7,7 @@ const page = () => {
     <>
       <div className="mt-40 flex justify-center">
         <div className="w-[1229px] h-[400px] relative">
-          <Link href="/workspace/video">
+          <Link href="/workspace/stanby">
             <Image
               src="/images/work.jpg"
               alt="workspace"
