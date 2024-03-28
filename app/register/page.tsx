@@ -1,6 +1,7 @@
 'use client'
 
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 import React from "react";
 
 // Firebaseの初期化を行うためfirebaseAppをインポート
@@ -16,12 +17,20 @@ const page = () => {
   const doRegister = () => {
     initializeApp(firebaseConfig);
     const auth = getAuth();
+    const db = getFirestore();
 
     // Firebaseで用意されているユーザー登録の関数
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         // ユーザー登録すると自動的にログインされてuserCredential.userでユーザーの情報を取得できる
         const user = userCredential.user;
+
+        await addDoc(collection(db, "users"), {
+          email: user.email,
+          uid: user.uid,
+          points: 0,
+        });
+
         // ユーザー登録ができたかどうかをわかりやすくするためのアラート
         alert('登録完了！');
         console.log(user);
