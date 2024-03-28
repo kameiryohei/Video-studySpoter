@@ -3,11 +3,9 @@
 import Header from "./components/header";
 import Image from "next/image";
 import Link from "next/link";
-import { AuthProvider, useAuth } from "./auth_context";
 
 const Home = () => {
   return (
-    <AuthProvider>
       <div className="px-20 py-12">
         <Header />
         <div className="w-full h-full flex gap-x-20 justify-center items-end">
@@ -57,7 +55,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </AuthProvider>
   );
 };
 
