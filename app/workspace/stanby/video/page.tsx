@@ -2,7 +2,8 @@
 import OT from "@opentok/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { SlArrowLeftCircle, SlArrowRightCircle } from "react-icons/sl";
+import { SlArrowLeftCircle } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 type Stream = {
   streamId: string;
@@ -16,6 +17,8 @@ const token = process.env.NEXT_PUBLIC_OPENTOK_TOKEN;
 const page = () => {
   const [subscribers, setSubscribers] = useState<Stream[]>([]);
   const [publisher, setPublisher] = useState<OT.Publisher | null>(null); // 新しい状態を追加
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const router = useRouter();
 
   // エラーはalertで通知する
   const handleError = (error: any) => {
@@ -80,10 +83,23 @@ const page = () => {
     }
     const session = OT.initSession(apiKey, sessionId);
     initializeSession();
+
+    const timer = setInterval(() => {
+      setElapsedTime((prevTime) => prevTime + 1);
+    }, 1000);
+
     return () => {
+      clearInterval(timer);
       session.disconnect();
     };
   }, []);
+
+  const handleEndButtonClick = () => {
+    const params = new URLSearchParams();
+    params.append("time", elapsedTime.toString());
+    const href = `/workspace/stanby/video/result?${params}`;
+    router.push(href);
+  };
 
   return (
     <>
@@ -93,12 +109,17 @@ const page = () => {
           className="mt-5 ml-5 hover:ring-4 hover:ring-blue-300 rounded-full duration-300"
         />
       </Link>
-      <Link href="/">
-        <SlArrowRightCircle
-          size={40}
-          className=" absolute right-0 top-0 mt-5 mr-5 hover:ring-4 hover:ring-blue-300 rounded-full duration-300"
-        />
-      </Link>
+      <div className="flex justify-center mt-8 text-2xl">
+        経過時間: {elapsedTime} 秒
+      </div>
+
+      <button
+        onClick={handleEndButtonClick}
+        className="py-2 px-4 bg-blue-300 hover:bg-blue-500 absolute right-0 top-0 mt-5 mr-5 hover:ring-4 hover:ring-blue-300 rounded-full duration-300"
+      >
+        終了
+      </button>
+
       <div className="mt-36 flex justify-center items-center flex-col">
         <div className="flex justify-center gap-10 flex-wrap">
           <div className="flex flex-col items-center">
