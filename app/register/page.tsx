@@ -1,7 +1,7 @@
 'use client'
 
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 import React from "react";
 
 // Firebaseの初期化を行うためfirebaseAppをインポート
@@ -25,7 +25,7 @@ const page = () => {
         // ユーザー登録すると自動的にログインされてuserCredential.userでユーザーの情報を取得できる
         const user = userCredential.user;
 
-        await addDoc(collection(db, "users"), {
+        await setDoc(doc(db, "users", user.uid), {
           email: user.email,
           uid: user.uid,
           points: 0,
