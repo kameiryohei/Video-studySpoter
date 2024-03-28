@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Secular_One } from "next/font/google";
 import "./globals.css";
+import { AuthProvider, useAuth } from "./auth_context";
 
 const inter = Secular_One({
   subsets: ["latin"],
@@ -19,7 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }
