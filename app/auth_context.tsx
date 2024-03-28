@@ -12,7 +12,7 @@ let auth = getAuth();
 
 const useAuth = () => React.useContext(AuthContext);
 
-const AuthProvider = ({ children }: { children: JSX.Element }) => {
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = React.useState<User | null>(null)
     const [loading, setLoading] = React.useState(true)
 
