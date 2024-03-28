@@ -26,7 +26,7 @@ const page = () => {
         }
         );
       });
-      rankings.sort((a, b) => a.points + b.points);
+      rankings.sort((a, b) => b.points + a.points);
       console.log(rankings);
       setRanking(rankings);
     };
