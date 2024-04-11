@@ -1,7 +1,14 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { collection, addDoc, doc, updateDoc, getFirestore, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  getFirestore,
+  getDocs,
+} from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "@/app/firebase_config";
 import { useAuth } from "@/app/auth_context";
@@ -16,22 +23,24 @@ const page = () => {
     console.log(currentUser);
     const updateUser = async () => {
       if (time) {
-        initializeApp(firebaseConfig)
+        initializeApp(firebaseConfig);
         const db = getFirestore();
         await addDoc(collection(db, `users/${currentUser!.uid}/history`), {
           resultTime: parseInt(time),
         });
 
-        const querySnapshot = await getDocs(collection(db, `users/${currentUser!.uid}/history`));
+        const querySnapshot = await getDocs(
+          collection(db, `users/${currentUser!.uid}/history`)
+        );
         var totalPoint = 0;
         await querySnapshot.forEach((doc) => {
           totalPoint += doc.data().resultTime ?? 0;
         });
-        await updateDoc(doc(db, 'users', currentUser!.uid), {
-          points: totalPoint + parseInt(time)
+        await updateDoc(doc(db, "users", currentUser!.uid), {
+          points: totalPoint + parseInt(time),
         });
       }
-    }
+    };
 
     updateUser();
   }, []);
